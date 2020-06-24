@@ -30,7 +30,16 @@ export default {
   },
   methods: {
     onSave: function() {
-      store.commit("onSave");
+      store
+        .dispatch("onSave")
+        .then(res => {
+          return console.log(res);
+        })
+        .catch(err => {
+          console.log(err);
+          const alertStr = err.map(input => input.label).join(", ");
+          return alert(`Fields "${alertStr}" are required.`);
+        });
     }
   },
   components: {

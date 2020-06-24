@@ -1,5 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
+// import axios from "axios";
 import router from "../router";
 
 Vue.use(Vuex);
@@ -22,7 +23,7 @@ const store = new Vuex.Store({
         type: "checkbox",
         label: "Currenty Employed",
         name: "currentlyEmployed",
-        value: ""
+        value: "false"
       }
     ]
   },
@@ -37,12 +38,46 @@ const store = new Vuex.Store({
       }
       return (state.inputs[index].value = payload.value);
     },
-    onSave: function() {
-      console.log("save");
-      router.push("/review");
+
+    setValidation: function(state, payload) {
+      return payload;
     }
   },
-  actions: {},
+  actions: {
+    onSave: function({ state, dispatch }) {
+      return new Promise((resolve, reject) => {
+        dispatch("validateInfo")
+          .then(errors => {
+            reject(errors);
+          })
+          .catch(() => {
+            let userObj = {};
+
+            state.inputs.forEach(infoObj => {
+              userObj = { ...userObj, [infoObj.name]: infoObj.value };
+            });
+
+            // axios.post("/api/user", userObj);
+            console.log("save", userObj);
+            router.push("/review");
+            resolve(userObj);
+          });
+      });
+    },
+
+    validateInfo: function({ state }) {
+      return new Promise((resolve, reject) => {
+        const validationErrors = state.inputs.filter(
+          input => !input.value && input.type !== "checkbox"
+        );
+
+        if (validationErrors.length > 0) {
+          resolve(validationErrors);
+        }
+        reject(false);
+      });
+    }
+  },
   modules: {}
 });
 
