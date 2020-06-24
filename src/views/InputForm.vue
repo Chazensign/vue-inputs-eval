@@ -37,6 +37,9 @@ export default {
         })
         .catch(err => {
           console.log(err);
+          if (typeof err === "string") {
+            return alert(err);
+          }
           const alertStr = err.map(input => input.label).join(", ");
           return alert(`Fields "${alertStr}" are required.`);
         });

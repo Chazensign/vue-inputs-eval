@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 // import axios from "axios";
-import router from "../router";
+// import router from "../router";
 
 Vue.use(Vuex);
 
@@ -18,7 +18,7 @@ const store = new Vuex.Store({
       },
       { type: "text", label: "Company Name", name: "companyName", value: "" },
       { type: "phone", label: "Phone", name: "phone", value: "" },
-      { type: "number", label: "Salary", name: "salary", value: "" },
+      { type: "text", label: "Salary", name: "salary", value: "" },
       {
         type: "checkbox",
         label: "Currenty Employed",
@@ -59,13 +59,14 @@ const store = new Vuex.Store({
 
             // axios.post("/api/user", userObj);
             console.log("save", userObj);
-            router.push("/review");
+            // router.push("/review");
             resolve(userObj);
           });
       });
     },
 
     validateInfo: function({ state }) {
+      const { inputs } = state;
       return new Promise((resolve, reject) => {
         const validationErrors = state.inputs.filter(
           input => !input.value && input.type !== "checkbox"
@@ -73,6 +74,20 @@ const store = new Vuex.Store({
 
         if (validationErrors.length > 0) {
           resolve(validationErrors);
+        }
+
+        const salaryInput = inputs.find(input => input.name === "salary");
+
+        // eslint-disable-next-line no-useless-escape
+        const regex = /^\$?([1-9]{1}[0-9]{0,2}(\,[0-9]{3})*(\.[0-9]{0,2})?|[1-9]{1}[0-9]{0,}(\.[0-9]{0,2})?|0(\.[0-9]{0,2})?|(\.[0-9]{1,2})?)$/;
+        const validSalary = regex.test(salaryInput.value);
+        console.log(validSalary);
+        if (!validSalary) {
+          resolve("Salary input is invalid.");
+        }
+        const salaryNumber = salaryInput.value.replace(/[^0-9.]/g, "");
+        if (+salaryNumber < 10000) {
+          resolve("Salary must be greater than $10,000.");
         }
         reject(false);
       });
