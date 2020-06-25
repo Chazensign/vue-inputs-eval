@@ -58,19 +58,17 @@ const store = new Vuex.Store({
     }
   },
   actions: {
-    onSave: function({ state, dispatch, commit }) {
+    onSave: function({ state, commit }) {
       return new Promise((resolve, reject) => {
-        dispatch("validateInfo")
-          .then(errors => {
-            reject(errors);
-          })
-          .catch(newSalary => {
+        axios
+          .post("/user/validate", { inputs: state.inputs })
+          .then(res => {
             let userObj = {};
 
             state.inputs.forEach(infoObj => {
               userObj = { ...userObj, [infoObj.name]: infoObj.value };
             });
-            userObj.salaryNumber = newSalary;
+            userObj.salaryNumber = +res.data;
             axios.post("/api/user", userObj).then(res => {
               const { users, message } = res.data;
 
@@ -79,34 +77,10 @@ const store = new Vuex.Store({
               commit("setValues", {});
               resolve(message);
             });
+          })
+          .catch(err => {
+            reject(err.response.data.message);
           });
-      });
-    },
-
-    validateInfo: function({ state }) {
-      const { inputs } = state;
-      return new Promise((resolve, reject) => {
-        const validationErrors = state.inputs.filter(
-          input => !input.value && input.type !== "checkbox"
-        );
-
-        if (validationErrors.length > 0) {
-          resolve(validationErrors);
-        }
-
-        const salaryInput = inputs.find(input => input.name === "salary");
-
-        // eslint-disable-next-line no-useless-escape
-        const regex = /^\$?([1-9]{1}[0-9]{0,2}(\,[0-9]{3})*(\.[0-9]{0,2})?|[1-9]{1}[0-9]{0,}(\.[0-9]{0,2})?|0(\.[0-9]{0,2})?|(\.[0-9]{1,2})?)$/;
-        const validSalary = regex.test(salaryInput.value);
-        if (!validSalary) {
-          resolve("Salary input is invalid.");
-        }
-        const salaryNumber = salaryInput.value.replace(/[^0-9.]/g, "");
-        if (+salaryNumber < 10000) {
-          resolve("Salary must be greater than $10,000.");
-        }
-        reject(+salaryNumber);
       });
     }
   },

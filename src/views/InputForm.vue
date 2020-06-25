@@ -15,6 +15,12 @@
         <button @click="onSave">Process Info</button>
       </div>
     </div>
+    <div>
+      <p>
+        You can submit multiple users to and view a list of all the cards. To
+        view salary information click on a user card.
+      </p>
+    </div>
     <div id="lower-boxes">
       <section id="cards-cont">
         <userCard
@@ -62,8 +68,6 @@ export default {
           if (typeof err === "string") {
             return alert(err);
           }
-          const alertStr = err.map(input => input.label).join(", ");
-          return alert(`Fields "${alertStr}" are required.`);
         });
     },
     selectUser: function(event) {
