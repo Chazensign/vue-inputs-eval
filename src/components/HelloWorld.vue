@@ -1,20 +1,21 @@
 <template>
-  <div class="hello"></div>
+  <div id="user-card"></div>
 </template>
 
 <script>
 export default {
-  name: "HelloWorld",
+  name: "UserCard",
   props: {
-    msg: String
+    users: []
   }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
+#user-card {
+  border: 1px solid black;
+  margin: 10px;
 }
 ul {
   list-style-type: none;

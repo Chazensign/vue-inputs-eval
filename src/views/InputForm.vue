@@ -33,7 +33,7 @@ export default {
       store
         .dispatch("onSave")
         .then(res => {
-          return console.log(res);
+          return alert(res);
         })
         .catch(err => {
           console.log(err);
