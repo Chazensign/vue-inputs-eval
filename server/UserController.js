@@ -11,6 +11,14 @@ module.exports = {
       .send({ userId: newUserId, users: mockDB.users, message: "User saved." });
     newUserId++;
   },
+  updateUserInfo: (req, res) => {
+    const user = req.body;
+    const index = mockDB.users.findIndex(
+      savedUser => savedUser.userId === user.userId
+    );
+    mockDB.users[index] = user;
+    res.status(200).send({ users: mockDB.users, message: "User updated." });
+  },
   validateInputs: (req, res) => {
     const { inputs } = req.body;
     const validationErrors = inputs.filter(
@@ -18,7 +26,9 @@ module.exports = {
     );
 
     if (validationErrors.length === 1) {
-      return res.status(406).send({ message: validationErrors });
+      return res
+        .status(406)
+        .send({ message: `${validationErrors[0].label} is required.` });
     } else if (validationErrors.length > 1) {
       const lastError = validationErrors.pop().label;
       const alertStr = validationErrors.map(input => input.label).join(", ");

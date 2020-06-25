@@ -22,6 +22,7 @@ const store = new Vuex.Store({
         type: "checkbox",
         label: "Currenty Employed",
         name: "currentlyEmployed",
+        checked: "false",
         value: "false"
       }
     ],
@@ -52,6 +53,11 @@ const store = new Vuex.Store({
     },
     setValues: function(state, payload) {
       const inputsWithValues = state.inputs.map(input => {
+        if (input.type === "checkbox") {
+          document.getElementById("currentlyEmployed").checked =
+            payload[input.name] || false;
+          return { ...input, value: payload[input.name] || false };
+        }
         return { ...input, value: payload[input.name] || "" };
       });
       return (state.inputs = inputsWithValues);
@@ -64,12 +70,21 @@ const store = new Vuex.Store({
           .post("/user/validate", { inputs: state.inputs })
           .then(res => {
             let userObj = {};
-
             state.inputs.forEach(infoObj => {
               userObj = { ...userObj, [infoObj.name]: infoObj.value };
             });
             userObj.salaryNumber = +res.data;
-            axios.post("/api/user", userObj).then(res => {
+            if (state.selectedUser) {
+              userObj.userId = state.selectedUser.userId;
+              return axios.put("/user", userObj).then(res => {
+                const { users, message } = res.data;
+                commit("updateUsers", users);
+                commit("selectUser", null);
+                commit("setValues", {});
+                resolve(message);
+              });
+            }
+            axios.post("/user", userObj).then(res => {
               const { users, message } = res.data;
 
               commit("updateUsers", users);

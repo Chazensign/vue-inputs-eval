@@ -17,8 +17,8 @@
     </div>
     <div>
       <p>
-        You can submit multiple users to and view a list of all the cards. To
-        view salary information click on a user card.
+        You can submit multiple users and view a list of all the submitted
+        user's cards. To view salary information click on a user card.
       </p>
     </div>
     <div id="lower-boxes">
@@ -54,7 +54,8 @@ export default {
     inputs: state => state.inputs,
     salary: state => (state.selectedUser ? state.selectedUser.salaryNumber : 0),
     users: state => state.users,
-    selectedUser: state => state.selectedUser
+    selectedUser: state => state.selectedUser,
+    buttonMessage: state => (state.selectedUser ? "Process Info" : "Update")
   }),
 
   methods: {
@@ -77,6 +78,7 @@ export default {
       store.commit("setValues", clickedUser);
     },
     clearInputs: function() {
+      store.commit("selectUser", null);
       store.commit("setValues", {});
     }
   },
