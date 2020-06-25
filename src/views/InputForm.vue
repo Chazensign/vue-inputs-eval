@@ -12,7 +12,7 @@
       />
       <div class="button-wrapper">
         <button @click="clearInputs">Clear</button>
-        <button @click="onSave">Process Info</button>
+        <button @click="onSave">{{ buttonMessage }}</button>
       </div>
     </div>
     <div>
@@ -55,7 +55,7 @@ export default {
     salary: state => (state.selectedUser ? state.selectedUser.salaryNumber : 0),
     users: state => state.users,
     selectedUser: state => state.selectedUser,
-    buttonMessage: state => (state.selectedUser ? "Process Info" : "Update")
+    buttonMessage: state => (state.selectedUser ? "Update" : "Process Info")
   }),
 
   methods: {
