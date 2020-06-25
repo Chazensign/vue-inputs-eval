@@ -1,33 +1,56 @@
 <template>
-  <div class="input-form">
-    <UserInput
-      v-for="(input, index) in inputs"
-      :key="index"
-      :inputType="input.type"
-      :inputLabel="input.label"
-      :name="input.name"
-      :inputValue="input.value"
-      handleChange="handleChange"
-    />
-    <button @click="onSave">Process Info</button>
-  </div>
+  <main>
+    <div class="input-form">
+      <UserInput
+        v-for="(input, index) in inputs"
+        :key="index"
+        :inputType="input.type"
+        :inputLabel="input.label"
+        :name="input.name"
+        :inputValue="input.value"
+        handleChange="handleChange"
+      />
+      <div class="button-wrapper">
+        <button @click="clearInputs">Clear</button>
+        <button @click="onSave">Process Info</button>
+      </div>
+    </div>
+    <div id="lower-boxes">
+      <section id="cards-cont">
+        <userCard
+          v-for="user in users"
+          :key="user.userId"
+          :userId="user.userId"
+          :userName="user.fullName"
+          :position="user.position"
+          :company="user.companyName"
+          :phone="user.phone"
+          :selectUser="selectUser"
+        />
+      </section>
+      <aside>
+        <SalaryDisplay :salary="salary" />
+      </aside>
+    </div>
+  </main>
 </template>
 
 <script>
 import { mapState } from "vuex";
 import UserInput from "@/components/userInput.vue";
+import UserCard from "@/components/UserCard.vue";
+import SalaryDisplay from "@/components/SalaryDisplay.vue";
 import store from "../store/index.js";
 
 export default {
   name: "InputForm",
   computed: mapState({
-    inputs: state => state.inputs
+    inputs: state => state.inputs,
+    salary: state => (state.selectedUser ? state.selectedUser.salaryNumber : 0),
+    users: state => state.users,
+    selectedUser: state => state.selectedUser
   }),
-  data: function() {
-    const vm = this,
-      localInputs = vm.inputs;
-    return { localInputs };
-  },
+
   methods: {
     onSave: function() {
       store
@@ -36,17 +59,27 @@ export default {
           return alert(res);
         })
         .catch(err => {
-          console.log(err);
           if (typeof err === "string") {
             return alert(err);
           }
           const alertStr = err.map(input => input.label).join(", ");
           return alert(`Fields "${alertStr}" are required.`);
         });
+    },
+    selectUser: function(event) {
+      const id = event.target.attributes.value.value;
+      const clickedUser = this.users.find(user => user.userId === +id);
+      store.commit("selectUser", clickedUser);
+      store.commit("setValues", clickedUser);
+    },
+    clearInputs: function() {
+      store.commit("setValues", {});
     }
   },
   components: {
-    UserInput
+    UserInput,
+    UserCard,
+    SalaryDisplay
   }
 };
 </script>
@@ -61,8 +94,18 @@ export default {
 .input-line {
   padding: 2px;
 }
-
-a {
-  color: #42b983;
+.button-wrapper {
+  display: flex;
+  justify-content: space-between;
+  width: 75%;
+}
+#lower-boxes {
+  padding-top: 30px;
+  display: flex;
+  justify-content: space-between;
+}
+#cards-cont {
+  display: flex;
+  flex-wrap: wrap;
 }
 </style>

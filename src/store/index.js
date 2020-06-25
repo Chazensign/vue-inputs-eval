@@ -16,7 +16,7 @@ const store = new Vuex.Store({
         value: ""
       },
       { type: "text", label: "Company Name", name: "companyName", value: "" },
-      { type: "phone", label: "Phone", name: "phone", value: "" },
+      { type: "tel", label: "Phone", name: "phone", value: "" },
       { type: "text", label: "Salary", name: "salary", value: "" },
       {
         type: "checkbox",
@@ -30,7 +30,6 @@ const store = new Vuex.Store({
   },
   mutations: {
     handleChange: function(state, payload) {
-      console.log(state);
       const index = state.inputs.findIndex(
         input => input.name === payload.name
       );
@@ -50,6 +49,12 @@ const store = new Vuex.Store({
 
     setValidation: function(state, payload) {
       return payload;
+    },
+    setValues: function(state, payload) {
+      const inputsWithValues = state.inputs.map(input => {
+        return { ...input, value: payload[input.name] || "" };
+      });
+      return (state.inputs = inputsWithValues);
     }
   },
   actions: {
@@ -59,20 +64,20 @@ const store = new Vuex.Store({
           .then(errors => {
             reject(errors);
           })
-          .catch(() => {
+          .catch(newSalary => {
             let userObj = {};
 
             state.inputs.forEach(infoObj => {
               userObj = { ...userObj, [infoObj.name]: infoObj.value };
             });
-
+            userObj.salaryNumber = newSalary;
             axios.post("/api/user", userObj).then(res => {
-              const { users, userId, message } = res.data;
+              const { users, message } = res.data;
 
               commit("updateUsers", users);
-              commit("selectUser", userId);
+              commit("selectUser", null);
+              commit("setValues", {});
               resolve(message);
-              console.log("save", userId);
             });
           });
       });
@@ -101,7 +106,7 @@ const store = new Vuex.Store({
         if (+salaryNumber < 10000) {
           resolve("Salary must be greater than $10,000.");
         }
-        reject(false);
+        reject(+salaryNumber);
       });
     }
   },
