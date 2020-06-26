@@ -10,9 +10,10 @@ npm install
 npm run serve
 ```
 
-### Compiles and minifies for production
+### Starts node server
+Server runs on port 4321
 ```
-npm run build
+node server/server
 ```
 
 ### Lints and fixes files
