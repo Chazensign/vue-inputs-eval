@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const { SERVER_PORT } = process.env;
+const SERVER_PORT = 4321;
 const userCont = require("./UserController");
 
 const app = express();
